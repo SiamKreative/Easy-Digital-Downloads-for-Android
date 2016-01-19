@@ -1,15 +1,17 @@
 jQuery(document).ready(function ($) {
 
+	var websiteUrl = $('#setting_website_url');
 	var apiKey = $('#setting_api_key');
 	var apiToken = $('#setting_api_token');
-	var routeStats = 'https://getawesomesupport.com/edd-api/stats/';
-	var routeSales = 'https://getawesomesupport.com/edd-api/sales/';
 
 	/*
 	Get Settings
 	 */
 	if (localStorage.getItem('edd_settings')) {
+
 		var settings = JSON.parse(localStorage.getItem('edd_settings'));
+		var routeStats = settings.websiteUrl + '/edd-api/stats/';
+		var routeSales = settings.websiteUrl + '/edd-api/sales/';
 		var params = {
 			key: settings.apiKey,
 			token: settings.apiToken
@@ -20,6 +22,7 @@ jQuery(document).ready(function ($) {
 		/*
 		Show existing settings
 		 */
+		websiteUrl.val(settings.websiteUrl);
 		apiKey.val(settings.apiKey);
 		apiToken.val(settings.apiToken);
 
@@ -118,7 +121,7 @@ jQuery(document).ready(function ($) {
 		}
 
 	} else {
-		alert('API credential not found. Please edit the General Settings.');
+		alert('Invalid settings. Please enter valid credentials.');
 
 		/*
 		Save Settings
@@ -126,6 +129,7 @@ jQuery(document).ready(function ($) {
 		$('#setting_form').on('submit', function (event) {
 			event.preventDefault();
 			var saveSettings = {
+				'websiteUrl': websiteUrl.val(),
 				'apiKey': apiKey.val(),
 				'apiToken': apiToken.val()
 			};

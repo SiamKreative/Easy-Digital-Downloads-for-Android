@@ -127,3 +127,7 @@ html, body {
 .hide-while-ajax {
 	display: none;
 }
+
+#setting_form .mdl-button {
+	margin-top: 1em;
+}
