@@ -3,6 +3,7 @@ jQuery(document).ready(function ($) {
 	var websiteUrl = $('#setting_website_url');
 	var apiKey = $('#setting_api_key');
 	var apiToken = $('#setting_api_token');
+	var refreshData = $('#setting_refresh_data');
 
 	/*
 	Get Settings
@@ -25,6 +26,9 @@ jQuery(document).ready(function ($) {
 		websiteUrl.val(settings.websiteUrl);
 		apiKey.val(settings.apiKey);
 		apiToken.val(settings.apiToken);
+		if (settings.refreshData) {
+			refreshData.prop('checked', 'true');
+		}
 
 		/*
 		Get the Statistics
@@ -107,9 +111,10 @@ jQuery(document).ready(function ($) {
 			$("#table_edd_sales tbody").html(tbl_body);
 		};
 
-		if (localStorage.getItem('edd_sales')) {
-			renderSales();
-		} else {
+		/**
+		 * Check if we need latest data
+		 */
+		function getData() {
 			$.ajax({
 				dataType: 'json',
 				url: endpointSales,
@@ -120,22 +125,36 @@ jQuery(document).ready(function ($) {
 			});
 		}
 
+		if (settings.refreshData) {
+			getData();
+		} else {
+			localStorage.getItem('edd_sales') ? renderSales() : getData();
+		}
+
 	} else {
 		alert('Invalid settings. Please enter valid credentials.');
-
-		/*
-		Save Settings
-		 */
-		$('#setting_form').on('submit', function (event) {
-			event.preventDefault();
-			var saveSettings = {
-				'websiteUrl': websiteUrl.val(),
-				'apiKey': apiKey.val(),
-				'apiToken': apiToken.val()
-			};
-			localStorage.setItem('edd_settings', JSON.stringify(saveSettings));
-		});
-
 	}
+
+	/*
+	Save Settings
+	 */
+	$('#setting_form').on('submit', function (event) {
+		event.preventDefault();
+
+		var refreshDataStatus;
+		if (refreshData.is(':checked')) {
+			refreshDataStatus = true;
+		} else {
+			refreshDataStatus = false;
+		}
+
+		var saveSettings = {
+			'websiteUrl': websiteUrl.val(),
+			'apiKey': apiKey.val(),
+			'apiToken': apiToken.val(),
+			'refreshData': refreshDataStatus
+		};
+		localStorage.setItem('edd_settings', JSON.stringify(saveSettings));
+	});
 
 });
